@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: emp-app-frontend:local-test
+          image: ghcr.io/pratik-khot/emp-app-frontend:c7e26398a1d3ee078f70b66eb14fbafaecd73e91
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
