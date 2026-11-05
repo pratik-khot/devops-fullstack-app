@@ -1,0 +1,91 @@
+
+name: Backend CI/CD
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-ci.yml'
+
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-ci.yml'
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE_NAME: ghcr.io/pratik-khot/emp-app-backend
+
+jobs:
+  backend-ci:
+    name: Backend Build, Test and Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout source code
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      # 2. Configure Go
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.19'
+          cache: true
+          cache-dependency-path: backend/go.sum
+
+      # 3. Download dependencies
+      - name: Download Go dependencies
+        working-directory: backend
+        run: go mod download
+
+      # 4. Run backend tests
+      - name: Run Go tests
+        working-directory: backend
+        run: go test -v ./...
+
+      # 5. Configure Docker Buildx
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # 6. Build backend Docker image
+      - name: Build backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          load: true
+          tags: emp-app-backend:${{ github.sha }}
+
+      # 7. Scan Docker image
+      - name: Scan backend image with Trivy
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: emp-app-backend:${{ github.sha }}
+          format: table
+          vuln-type: os,library
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: '1'
+
+      # 8. Authenticate with GHCR
+      - name: Login to GHCR
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # 9. Push image to GHCR
+      - name: Push backend image
+        if: github.event_name == 'push'
+        run: |
+          docker tag emp-app-backend:${{ github.sha }} ${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker push ${{ env.IMAGE_NAME }}:${{ github.sha }}
