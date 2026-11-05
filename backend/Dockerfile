@@ -1,5 +1,5 @@
 # Stage 1: Build
-FROM golang:1.19-alpine AS builder
+FROM golang:1.27.3-alpine AS builder
 
 WORKDIR /app
 
@@ -12,7 +12,9 @@ COPY . .
 RUN go build -o employee-api .
 
 # Stage 2: Runtime
-FROM alpine:3.20
+FROM alpine:3.24
+
+RUN apk update && apk upgrade --no-cache
 
 WORKDIR /app
 
