@@ -62,7 +62,7 @@ jobs:
           context: ./frontend
           load: true
           build-args: |
-            REACT_APP_SERVER_URL=${{ vars.REACT_APP_SERVER_URL }}
+            REACT_APP_SERVER_URL=/api/employees
           tags: emp-app-frontend:${{ github.sha }}
 
       # 7. Scan Docker image
