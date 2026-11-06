@@ -1,0 +1,29 @@
+name: Terraform Destroy Workflow
+on:
+  workflow_dispatch:
+    inputs:
+      terraform-root:
+        description: Terraform root to destroy, for example myapp/dev.
+        required: true
+        type: string
+      aws-region:
+        description: AWS region to use for the destroy operation.
+        required: true
+        type: string
+      environment:
+        description: The environment to use for the destroy operation.
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+    terraform-destroy:
+        uses: pratik-khot/github-common-workflows/.github/workflows/terraform-destroy.yml@v1.2.2
+        with:
+          terraform-root: ${{ inputs.terraform-root }}
+          aws-region: ${{ inputs.aws-region }}
+          environment: ${{ inputs.environment }}
+        secrets: inherit
