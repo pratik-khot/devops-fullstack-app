@@ -7,4 +7,4 @@ instance_type      = "t3.medium"
 
 # Optional:
 allowed_ssh_cidr = "0.0.0.0/0"
-key_name = "my-kp"
+key_name         = "my-kp"
