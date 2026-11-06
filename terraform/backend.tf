@@ -2,7 +2,7 @@ terraform {
 
   cloud {
 
-    organization = " "
+    organization = "aws-tf-org-pk"
 
     workspaces {
       name = "myapp-dev"
