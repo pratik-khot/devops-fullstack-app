@@ -31,7 +31,7 @@ resource "aws_instance" "app_server" {
   key_name = var.key_name
 
   root_block_device {
-    volume_size = 30
+    volume_size = 100
     volume_type = "gp3"
     encrypted   = true
   }
